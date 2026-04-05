@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>OCTA Clinic — Опрос пациентов</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal: #1D9E75;
+    --teal-d: #085041;
+    --teal-l: #E1F5EE;
+    --teal-m: #9FE1CB;
+    --amber: #BA7517;
+    --amber-l: #FFF8E6;
+    --amber-m: #FAC875;
+    --text: #0f1f1a;
+    --text-sec: #4a6860;
+    --text-ter: #8aada5;
+    --bg: #f4f8f6;
+    --white: #ffffff;
+    --border: rgba(29,158,117,0.14);
+    --shadow: 0 2px 16px rgba(8,80,65,0.07);
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+  .header {
+    background: var(--teal-d);
+    padding: 36px 28px 30px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: ''; position: absolute; top: -70px; right: -70px;
+    width: 220px; height: 220px; border-radius: 50%;
+    background: rgba(29,158,117,0.22); pointer-events: none;
+  }
+  .header::after {
+    content: ''; position: absolute; bottom: -50px; left: -50px;
+    width: 160px; height: 160px; border-radius: 50%;
+    background: rgba(159,225,203,0.12); pointer-events: none;
+  }
+  .header-eye {
+    font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--teal-m); margin-bottom: 12px; font-weight: 500;
+  }
+  .header-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px; font-weight: 700; color: #fff;
+    letter-spacing: .12em; text-transform: uppercase;
+    margin-bottom: 2px; line-height: 1;
+  }
+  .header-logo-sub {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px; font-weight: 400; letter-spacing: .55em;
+    text-transform: uppercase; color: var(--teal-m); margin-bottom: 14px;
+  }
+  .header-sub {
+    font-size: 14px; color: rgba(255,255,255,0.6);
+    font-weight: 300; line-height: 1.65;
+  }
+  .progress-wrap { background: var(--teal-d); padding: 0 28px 22px; }
+  .progress-bar { height: 3px; background: rgba(255,255,255,0.14); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--teal-m); border-radius: 2px; transition: width 0.45s ease; width: 0%; }
+  .progress-label { display: flex; justify-content: space-between; margin-top: 7px; font-size: 11px; color: rgba(255,255,255,0.38); }
+
+  .motive-banner {
+    margin: 20px 20px 0;
+    background: linear-gradient(135deg, #FFF8E6 0%, #FDEEC0 100%);
+    border: 1.5px solid var(--amber-m); border-radius: var(--radius);
+    padding: 18px 20px; display: flex; gap: 14px; align-items: flex-start;
+  }
+  .motive-icon { font-size: 28px; flex-shrink: 0; margin-top: 2px; }
+  .motive-title { font-size: 15px; font-weight: 700; color: #6B3F00; margin-bottom: 5px; }
+  .motive-text { font-size: 13px; color: #8A5500; line-height: 1.6; }
+  .motive-badge {
+    display: inline-block; margin-top: 10px;
+    background: var(--amber); color: white;
+    font-size: 12px; font-weight: 600;
+    padding: 5px 12px; border-radius: 20px; letter-spacing: .02em;
+  }
+
+  .intro {
+    margin: 12px 20px 0; background: var(--white);
+    border-radius: var(--radius); padding: 16px 20px;
+    border: 1px solid var(--border); box-shadow: var(--shadow);
+  }
+  .intro-text { font-size: 13px; color: var(--text-sec); line-height: 1.7; }
+
+  .section { margin: 18px 20px 0; }
+  .section-label {
+    font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--teal); font-weight: 600; margin-bottom: 10px; padding-left: 2px;
+  }
+
+  .q-card {
+    background: var(--white); border-radius: var(--radius);
+    padding: 20px 20px 18px; margin-bottom: 10px;
+    border: 1px solid var(--border); box-shadow: var(--shadow);
+  }
+  .q-num { font-size: 10px; font-weight: 600; color: var(--teal); letter-spacing: .1em; margin-bottom: 6px; }
+  .q-text { font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.45; margin-bottom: 4px; }
+  .q-hint { font-size: 12px; color: var(--text-ter); margin-bottom: 14px; line-height: 1.5; }
+
+  .opts { display: flex; flex-direction: column; gap: 8px; }
+  .opts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .opt {
+    display: flex; align-items: center; gap: 12px;
+    padding: 13px 14px; border-radius: 11px;
+    border: 1.5px solid var(--border); cursor: pointer;
+    transition: all 0.17s; background: var(--bg);
+    font-size: 14px; color: var(--text-sec); font-weight: 400;
+    user-select: none; -webkit-user-select: none; line-height: 1.4;
+  }
+  .opt:active { transform: scale(0.985); }
+  .opt.selected { border-color: var(--teal); background: var(--teal-l); color: var(--teal-d); font-weight: 500; }
+  .opt-dot {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 2px solid #c0d8d2; flex-shrink: 0;
+    transition: all 0.17s; background: var(--white);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .opt.selected .opt-dot { border-color: var(--teal); background: var(--teal); }
+  .opt.selected .opt-dot::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: white; }
+  .opt-sq {
+    width: 18px; height: 18px; border-radius: 5px;
+    border: 2px solid #c0d8d2; flex-shrink: 0;
+    transition: all 0.17s; background: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: transparent; font-weight: 700;
+  }
+  .opt.selected .opt-sq { border-color: var(--teal); background: var(--teal); color: white; }
+
+  .nps-scale { display: flex; gap: 5px; flex-wrap: nowrap; margin-top: 6px; }
+  .nps-btn {
+    flex: 1; height: 48px; border-radius: 10px;
+    border: 1.5px solid var(--border); background: var(--bg);
+    font-size: 15px; font-weight: 600; color: var(--text-ter);
+    cursor: pointer; transition: all 0.17s;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Sans', sans-serif; min-width: 0;
+  }
+  .nps-btn:active { transform: scale(0.9); }
+  .nps-btn.sel-low  { border-color: #d84040; background: #fdf0f0; color: #b02020; }
+  .nps-btn.sel-mid  { border-color: #e0a030; background: #fdf8ed; color: #8a6010; }
+  .nps-btn.sel-high { border-color: var(--teal); background: var(--teal-l); color: var(--teal-d); }
+  .nps-labels { display: flex; justify-content: space-between; margin-top: 7px; font-size: 11px; color: var(--text-ter); }
+
+  .rating-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-bottom: 0.5px solid var(--border); gap: 10px;
+  }
+  .rating-row:last-child { border-bottom: none; }
+  .rating-label { font-size: 13px; color: var(--text-sec); line-height: 1.4; flex: 1; }
+  .rating-stars { display: flex; gap: 5px; flex-shrink: 0; }
+  .star-btn {
+    width: 36px; height: 36px; border-radius: 9px;
+    border: 1.5px solid var(--border); background: var(--bg);
+    font-size: 14px; font-weight: 700; color: var(--text-ter);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Sans', sans-serif; transition: all 0.15s;
+  }
+  .star-btn:active { transform: scale(0.85); }
+  .star-btn.lit { border-color: var(--teal); background: var(--teal); color: white; }
+
+  .conditional {
+    display: none; margin-top: 12px; padding: 16px;
+    background: var(--teal-l); border-radius: 11px;
+    border: 1px solid rgba(29,158,117,0.18);
+  }
+  .conditional.show { display: block; }
+  .cond-label { font-size: 13px; font-weight: 600; color: var(--teal-d); margin-bottom: 9px; }
+  .cond-spacer { margin-top: 14px; }
+
+  .q-textarea {
+    width: 100%; border: 1.5px solid var(--border);
+    border-radius: 11px; padding: 13px 15px;
+    font-family: 'DM Sans', sans-serif; font-size: 14px;
+    color: var(--text); background: var(--bg); resize: none;
+    min-height: 100px; outline: none; transition: border-color 0.2s; line-height: 1.6;
+  }
+  .q-textarea:focus { border-color: var(--teal); background: var(--white); }
+  .q-textarea::placeholder { color: var(--text-ter); }
+
+  .submit-wrap { margin: 26px 20px 0; }
+  .btn-submit {
+    width: 100%; background: var(--teal); color: white; border: none;
+    border-radius: 14px; padding: 18px 24px;
+    font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 700;
+    cursor: pointer; letter-spacing: .02em; transition: all 0.2s;
+    box-shadow: 0 4px 22px rgba(29,158,117,0.32);
+  }
+  .btn-submit:active { transform: scale(0.98); }
+  .submit-note { text-align: center; font-size: 12px; color: var(--text-ter); margin-top: 10px; line-height: 1.6; }
+
+  .success-screen { display: none; text-align: center; padding: 60px 28px; }
+  .success-screen.show { display: block; }
+  .success-icon {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: var(--teal-l); display: flex; align-items: center;
+    justify-content: center; font-size: 36px; margin: 0 auto 22px;
+  }
+  .success-title { font-size: 24px; font-weight: 700; color: var(--teal-d); margin-bottom: 12px; }
+  .success-text { font-size: 14px; color: var(--text-sec); line-height: 1.7; max-width: 300px; margin: 0 auto 24px; }
+  .success-coupon {
+    background: linear-gradient(135deg, #FFF8E6, #FDEEC0);
+    border: 2px dashed var(--amber-m); border-radius: 16px;
+    padding: 22px 20px; max-width: 320px; margin: 0 auto;
+  }
+  .coupon-icon { font-size: 30px; margin-bottom: 10px; }
+  .coupon-title { font-size: 17px; font-weight: 700; color: #6B3F00; margin-bottom: 6px; }
+  .coupon-text { font-size: 13px; color: #8A5500; line-height: 1.6; }
+  .coupon-code {
+    margin-top: 14px; background: var(--amber); color: white;
+    font-size: 18px; font-weight: 700; letter-spacing: .12em;
+    padding: 11px 22px; border-radius: 10px; display: inline-block;
+  }
+  .coupon-note { font-size: 12px; color: #8A5500; margin-top: 9px; line-height: 1.5; }
+
+  .req { color: #D85A30; }
+  .form-body { transition: opacity 0.3s; }
+  .form-body.hidden { opacity: 0; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<div class="form-body" id="formBody">
+
+  <div class="header">
+    <div class="header-eye">Обратная связь</div>
+    <div class="header-logo">OCTA</div>
+    <div class="header-logo-sub">Clinic</div>
+    <div class="header-sub">Помогите нам стать лучше<br>для вас и вашей семьи</div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-label">
+      <span id="progressText">начните отвечать</span>
+      <span id="progressPct">0%</span>
+    </div>
+  </div>
+
+  <div class="motive-banner">
+    <div class="motive-icon">🎁</div>
+    <div>
+      <div class="motive-title">Подарок за ваши ответы</div>
+      <div class="motive-text">Пройдите опрос и получите <strong>скидку 10% на профессиональную гигиену</strong> в нашем новом филиале на Паркентской.</div>
+      <div class="motive-badge">⏱ Займёт 3–4 минуты</div>
+    </div>
+  </div>
+
+  <div class="intro">
+    <div class="intro-text">Все ответы анонимны. Мы используем их только для улучшения клиники — чтобы вам и вашей семье было комфортно.</div>
+  </div>
+
+  <!-- БЛОК 1 -->
+  <div class="section">
+    <div class="section-label">01 · О вас</div>
+
+    <div class="q-card">
+      <div class="q-num">Вопрос 1 из 11</div>
+      <div class="q-text">В каком районе вы живёте? <span class="req">*</span></div>
+      <div class="q-hint">Это помогает нам выбирать расположение новых клиник</div>
+      <div class="opts opts-grid" id="q1">
+        <div class="opt" data-q="q1" data-val="Мирабадский" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Мирабадский</div>
+        <div class="opt" data-q="q1" data-val="Юнусабадский" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Юнусабадский</div>
+        <div class="opt" data-q="q1" data-val="Чиланзарский" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Чиланзарский</div>
+        <div class="opt" data-q="q1" data-val="Яккасарайский" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Яккасарайский</div>
+        <div class="opt" data-q="q1" data-val="Учтепинский" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Учтепинский</div>
+        <div class="opt" data-q="q1" data-val="Алмазарский" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Алмазарский</div>
+        <div class="opt" data-q="q1" data-val="Бектемирский" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Бектемирский</div>
+        <div class="opt" data-q="q1" data-val="Сергелийский" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Сергелийский</div>
+        <div class="opt" data-q="q1" data-val="Шайхантаурский" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Шайхантаурский</div>
+        <div class="opt" data-q="q1" data-val="Яшнободский" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Яшнободский</div>
+        <div class="opt" data-q="q1" data-val="Мирзо-Улугбекский" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Мирзо-Улугбекский</div>
+        <div class="opt" data-q="q1" data-val="Другой район" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Другой район</div>
+        <div class="opt" data-q="q1" data-val="Другой город" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Другой город</div>
+      </div>
+      <div class="conditional" id="cond-q1-other">
+        <div class="cond-label">Укажите ваш район или город</div>
+        <textarea class="q-textarea" id="q1-other" placeholder="Введите район или город..." rows="2" oninput="updateProgress()"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- БЛОК 2 -->
+  <div class="section">
+    <div class="section-label">02 · Семья и дети</div>
+
+    <div class="q-card">
+      <div class="q-num">Вопрос 2 из 11</div>
+      <div class="q-text">Есть ли у вас дети до 18 лет?</div>
+      <div class="opts" id="q3">
+        <div class="opt" data-q="q3" data-val="Да" onclick="selectOpt(this,'radio'); showCond('cond-children', true)"><div class="opt-dot"></div>Да, есть</div>
+        <div class="opt" data-q="q3" data-val="Нет" onclick="selectOpt(this,'radio'); showCond('cond-children', false)"><div class="opt-dot"></div>Нет</div>
+      </div>
+      <div class="conditional" id="cond-children">
+        <div class="cond-label">Возраст детей</div>
+        <div class="opts" id="q4" style="margin-bottom:14px">
+          <div class="opt" data-q="q4" data-val="До 7 лет" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>До 7 лет (дошкольники)</div>
+          <div class="opt" data-q="q4" data-val="7-14 лет" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>7–14 лет (школьники)</div>
+          <div class="opt" data-q="q4" data-val="14-18 лет" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>14–18 лет</div>
+          <div class="opt" data-q="q4" data-val="Разный возраст" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Дети разного возраста</div>
+        </div>
+        <div class="cond-label">Есть ли у ваших детей постоянный детский стоматолог?</div>
+        <div class="opts" id="q5" style="margin-bottom:14px">
+          <div class="opt" data-q="q5" data-val="Да, другая клиника" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Да, ходим в другую клинику</div>
+          <div class="opt" data-q="q5" data-val="Да, OCTA" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Да, приходят сюда в OCTA</div>
+          <div class="opt" data-q="q5" data-val="Нет, ищем" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Нет, ищем хорошего специалиста</div>
+          <div class="opt" data-q="q5" data-val="Нет, не ходим" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Нет, пока не водим к стоматологу</div>
+        </div>
+        <div class="cond-label">Если бы мы открыли детское отделение — привели бы к нам детей?</div>
+        <div class="opts" id="q6">
+          <div class="opt" data-q="q6" data-val="Да точно" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Да, однозначно</div>
+          <div class="opt" data-q="q6" data-val="Скорее да" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Скорее да, если хорошие специалисты</div>
+          <div class="opt" data-q="q6" data-val="Не уверен" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Не уверен(а)</div>
+          <div class="opt" data-q="q6" data-val="Нет" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Нет</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- БЛОК 3 -->
+  <div class="section">
+    <div class="section-label">03 · Рекомендации</div>
+
+    <div class="q-card">
+      <div class="q-num">Вопрос 3 из 11</div>
+      <div class="q-text">С какой вероятностью вы порекомендуете OCTA близким? <span class="req">*</span></div>
+      <div class="q-hint">0 — точно не порекомендую · 10 — обязательно порекомендую</div>
+      <div class="nps-scale" id="npsScale">
+        <div class="nps-btn" onclick="selectNPS(this,0)">0</div>
+        <div class="nps-btn" onclick="selectNPS(this,1)">1</div>
+        <div class="nps-btn" onclick="selectNPS(this,2)">2</div>
+        <div class="nps-btn" onclick="selectNPS(this,3)">3</div>
+        <div class="nps-btn" onclick="selectNPS(this,4)">4</div>
+        <div class="nps-btn" onclick="selectNPS(this,5)">5</div>
+        <div class="nps-btn" onclick="selectNPS(this,6)">6</div>
+        <div class="nps-btn" onclick="selectNPS(this,7)">7</div>
+        <div class="nps-btn" onclick="selectNPS(this,8)">8</div>
+        <div class="nps-btn" onclick="selectNPS(this,9)">9</div>
+        <div class="nps-btn" onclick="selectNPS(this,10)">10</div>
+      </div>
+      <div class="nps-labels"><span>😐 Точно нет</span><span>😊 Обязательно</span></div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-num">Вопрос 4 из 11</div>
+      <div class="q-text">Что вы отметите при рекомендации?</div>
+      <div class="q-hint">Можно выбрать несколько</div>
+      <div class="opts" id="q8">
+        <div class="opt" data-q="q8" data-val="Качество лечения" onclick="selectOpt(this,'check')"><div class="opt-sq">✓</div>Высокое качество лечения</div>
+        <div class="opt" data-q="q8" data-val="Компетентные врачи" onclick="selectOpt(this,'check')"><div class="opt-sq">✓</div>Внимательные и компетентные врачи</div>
+        <div class="opt" data-q="q8" data-val="Без боли" onclick="selectOpt(this,'check')"><div class="opt-sq">✓</div>Безболезненное лечение</div>
+        <div class="opt" data-q="q8" data-val="Вежливый персонал" onclick="selectOpt(this,'check')"><div class="opt-sq">✓</div>Вежливый персонал и приятная атмосфера</div>
+        <div class="opt" data-q="q8" data-val="Удобная запись" onclick="selectOpt(this,'check')"><div class="opt-sq">✓</div>Удобная запись и гибкий график</div>
+        <div class="opt" data-q="q8" data-val="Цена-качество" onclick="selectOpt(this,'check')"><div class="opt-sq">✓</div>Хорошее соотношение цены и качества</div>
+        <div class="opt" data-q="q8" data-val="Оборудование" onclick="selectOpt(this,'check')"><div class="opt-sq">✓</div>Современное оборудование</div>
+        <div class="opt" data-q="q8" data-val="Другое" onclick="selectOpt(this,'check')"><div class="opt-sq">✓</div>Другое</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- БЛОК 4 -->
+  <div class="section">
+    <div class="section-label">04 · Ваш опыт</div>
+
+    <div class="q-card">
+      <div class="q-num">Вопрос 5 из 11</div>
+      <div class="q-text">Оцените ваш последний визит</div>
+      <div class="q-hint">1 — плохо, 5 — отлично</div>
+      <div id="ratingRows"></div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-num">Вопрос 6 из 11</div>
+      <div class="q-text">Как давно вы являетесь пациентом OCTA?</div>
+      <div class="opts" id="q-tenure">
+        <div class="opt" data-q="q-tenure" data-val="Первый раз" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Это мой первый визит</div>
+        <div class="opt" data-q="q-tenure" data-val="Менее 6 мес" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Менее 6 месяцев</div>
+        <div class="opt" data-q="q-tenure" data-val="6-12 мес" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>6–12 месяцев</div>
+        <div class="opt" data-q="q-tenure" data-val="Более года" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Более года</div>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-num">Вопрос 7 из 11</div>
+      <div class="q-text">Как вы впервые узнали о нашей клинике?</div>
+      <div class="opts" id="q10">
+        <div class="opt" data-q="q10" data-val="Рекомендация" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Порекомендовали друзья или знакомые</div>
+        <div class="opt" data-q="q10" data-val="Instagram" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Instagram (@octa_clinic_ или @dr_octa_)</div>
+        <div class="opt" data-q="q10" data-val="2GIS" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>2GIS</div>
+        <div class="opt" data-q="q10" data-val="Google" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Google / Google Maps</div>
+        <div class="opt" data-q="q10" data-val="Telegram" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Telegram-канал или бот OCTA</div>
+        <div class="opt" data-q="q10" data-val="Яндекс" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Яндекс.Карты</div>
+        <div class="opt" data-q="q10" data-val="Мимо прошёл" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Увидел(а) вывеску / прошёл(а) мимо</div>
+        <div class="opt" data-q="q10" data-val="Другое" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Другое</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- БЛОК 5 -->
+  <div class="section">
+    <div class="section-label">05 · Новый филиал на Паркентской</div>
+
+    <div class="q-card">
+      <div class="q-num">Вопрос 8 из 11</div>
+      <div class="q-text">Знаете ли вы, что мы открываем новый филиал на Паркентской?</div>
+      <div class="opts" id="q-parken">
+        <div class="opt" data-q="q-parken" data-val="Да, знаю" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Да, уже слышал(а)</div>
+        <div class="opt" data-q="q-parken" data-val="Нет, впервые" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Нет, узнал(а) сейчас</div>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-num">Вопрос 9 из 11</div>
+      <div class="q-text">Хотели бы вы записаться в новый филиал на Паркентской?</div>
+      <div class="opts" id="q-parken2">
+        <div class="opt" data-q="q-parken2" data-val="Да, удобнее" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Да — это удобнее для меня по расположению</div>
+        <div class="opt" data-q="q-parken2" data-val="Да, попробую" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Да, готов(а) попробовать</div>
+        <div class="opt" data-q="q-parken2" data-val="Остаюсь здесь" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Предпочту остаться в этом филиале</div>
+        <div class="opt" data-q="q-parken2" data-val="Не знаю" onclick="selectOpt(this,'radio')"><div class="opt-dot"></div>Ещё не думал(а)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- БЛОК 6 -->
+  <div class="section">
+    <div class="section-label">06 · Ваши идеи</div>
+
+    <div class="q-card">
+      <div class="q-num">Вопрос 10 из 11</div>
+      <div class="q-text">Что, по-вашему, стоит улучшить?</div>
+      <div class="q-hint">Можно выбрать несколько</div>
+      <div class="opts" id="q11">
+        <div class="opt" data-q="q11" data-val="Время ожидания" onclick="selectOpt(this,'check')"><div class="opt-sq">✓</div>Сократить время ожидания</div>
+        <div class="opt" data-q="q11" data-val="Онлайн-запись" onclick="selectOpt(this,'check')"><div class="opt-sq">✓</div>Улучшить онлайн-запись</div>
+        <div class="opt" data-q="q11" data-val="Прозрачность цен" onclick="selectOpt(this,'check')"><div class="opt-sq">✓</div>Более прозрачное ценообразование</div>
+        <div class="opt" data-q="q11" data-val="Детская зона" onclick="selectOpt(this,'check')"><div class="opt-sq">✓</div>Добавить детскую зону ожидания</div>
+        <div class="opt" data-q="q11" data-val="Рассрочка" onclick="selectOpt(this,'check')"><div class="opt-sq">✓</div>Больше вариантов рассрочки</div>
+        <div class="opt" data-q="q11" data-val="Напоминания" onclick="selectOpt(this,'check')"><div class="opt-sq">✓</div>Напоминания о визите заранее</div>
+        <div class="opt" data-q="q11" data-val="Парковка" onclick="selectOpt(this,'check')"><div class="opt-sq">✓</div>Парковка рядом с клиникой</div>
+        <div class="opt" data-q="q11" data-val="Часы работы" onclick="selectOpt(this,'check')"><div class="opt-sq">✓</div>Расширить часы работы</div>
+        <div class="opt" data-q="q11" data-val="Всё устраивает" onclick="selectOpt(this,'check')"><div class="opt-sq">✓</div>Всё устраивает</div>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-num">Вопрос 11 из 11</div>
+      <div class="q-text">Есть ли что-то, что вы хотели бы нам сказать?</div>
+      <div class="q-hint">Пожелания, идеи, благодарности или критика — всё ценно</div>
+      <textarea class="q-textarea" id="q12" placeholder="Напишите всё, что считаете важным..." rows="4" oninput="updateProgress()"></textarea>
+    </div>
+  </div>
+
+  <div class="submit-wrap">
+    <button class="btn-submit" onclick="submitForm()">Получить скидку 10% →</button>
+    <div class="submit-note">Ваши ответы анонимны · После отправки покажите купон администратору</div>
+  </div>
+
+</div>
+
+<!-- SUCCESS -->
+<div class="success-screen" id="successScreen">
+  <div class="success-icon">🙏</div>
+  <div class="success-title">Спасибо!</div>
+  <div class="success-text">Ваши ответы получены. Команда OCTA изучит их и учтёт при развитии клиники.</div>
+  <div class="success-coupon">
+    <div class="coupon-icon">🦷</div>
+    <div class="coupon-title">Ваша скидка готова</div>
+    <div class="coupon-text">Покажите этот экран администратору в нашем новом филиале на Паркентской улице</div>
+    <div class="coupon-code">OCTA-HYGI-10</div>
+    <div class="coupon-note">10% скидка на профессиональную гигиену<br>Действительна до конца 2026 года</div>
+  </div>
+</div>
+
+<script>
+const ratingItems = [
+  'Приём прошёл вовремя',
+  'Качество лечения',
+  'Врач объяснил всё понятно',
+  'Вежливость персонала',
+  'Чистота и комфорт',
+  'Цена соответствует качеству',
+];
+const ratingValues = {};
+const ratingWrap = document.getElementById('ratingRows');
+ratingItems.forEach((label, i) => {
+  const key = 'r' + i;
+  const row = document.createElement('div');
+  row.className = 'rating-row';
+  row.innerHTML = `
+    <div class="rating-label">${label}</div>
+    <div class="rating-stars" id="${key}">
+      ${[1,2,3,4,5].map(n=>`<div class="star-btn" onclick="selectRating('${key}',${n})">${n}</div>`).join('')}
+    </div>
+  `;
+  ratingWrap.appendChild(row);
+});
+
+function selectRating(key, val) {
+  ratingValues[key] = val;
+  document.getElementById(key).querySelectorAll('.star-btn').forEach((b, i) => {
+    b.classList.toggle('lit', i < val);
+  });
+  updateProgress();
+}
+
+function selectOpt(el, type) {
+  const q = el.dataset.q;
+  const group = document.querySelectorAll(`[data-q="${q}"]`);
+  if (type === 'radio') {
+    group.forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+  } else {
+    el.classList.toggle('selected');
+  }
+  if (q === 'q1') {
+    const v = el.dataset.val;
+    const show = (v === 'Другой район' || v === 'Другой город') && el.classList.contains('selected');
+    document.getElementById('cond-q1-other').classList.toggle('show', show);
+  }
+  updateProgress();
+}
+
+function showCond(id, show) {
+  document.getElementById(id).classList.toggle('show', show);
+  updateProgress();
+}
+
+let npsValue = null;
+function selectNPS(el, val) {
+  npsValue = val;
+  document.querySelectorAll('.nps-btn').forEach((b, i) => {
+    b.className = 'nps-btn';
+    if (i <= val) b.classList.add(val <= 6 ? 'sel-low' : val <= 8 ? 'sel-mid' : 'sel-high');
+  });
+  updateProgress();
+}
+
+const KEY_QS = ['q1','q3','q-tenure','q10','q-parken','q-parken2','q11','q8'];
+function updateProgress() {
+  let answered = 0;
+  const total = 10;
+  KEY_QS.forEach(q => { if (document.querySelector(`[data-q="${q}"].selected`)) answered++; });
+  if (npsValue !== null) answered++;
+  if (Object.keys(ratingValues).length >= 3) answered++;
+  const pct = Math.round((answered / total) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = answered + ' из ' + total + ' ответов';
+  document.getElementById('progressPct').textContent = pct + '%';
+}
+
+// ВСТАВЬ СЮДА свою ссылку из Google Apps Script после Deploy
+const GOOGLE_SCRIPT_URL = 'ВСТАВЬ_ССЫЛКУ_СЮДА';
+
+function submitForm() {
+  const results = {
+    district: document.querySelector('[data-q="q1"].selected')?.dataset.val,
+    nps: npsValue,
+    recommend_reasons: [...document.querySelectorAll('[data-q="q8"].selected')].map(e=>e.dataset.val),
+    improvements: [...document.querySelectorAll('[data-q="q11"].selected')].map(e=>e.dataset.val),
+    comment: document.getElementById('q12').value,
+    ratings: ratingValues,
+    source: document.querySelector('[data-q="q10"].selected')?.dataset.val,
+    has_children: document.querySelector('[data-q="q3"].selected')?.dataset.val,
+    tenure: document.querySelector('[data-q="q-tenure"].selected')?.dataset.val,
+    parken_aware: document.querySelector('[data-q="q-parken"].selected')?.dataset.val,
+    parken_intent: document.querySelector('[data-q="q-parken2"].selected')?.dataset.val,
+    timestamp: new Date().toISOString()
+  };
+
+  // Показываем купон сразу, не ждём ответа сервера
+  document.getElementById('formBody').classList.add('hidden');
+  setTimeout(() => {
+    document.getElementById('formBody').style.display = 'none';
+    document.getElementById('successScreen').classList.add('show');
+    window.scrollTo(0, 0);
+  }, 300);
+
+  // Отправляем данные в Google Sheets в фоне
+  if (GOOGLE_SCRIPT_URL !== 'ВСТАВЬ_ССЫЛКУ_СЮДА') {
+    fetch(GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(results)
+    }).catch(err => console.error('Ошибка отправки:', err));
+  }
+}
+</script>
+</body>
+</html>
